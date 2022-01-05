@@ -16,9 +16,9 @@ subprojects {
 
     repositories {
         mavenCentral()
-                maven {
-        url 'https://global.repo.jmix.io/repository/public'
-    }
+        maven {
+            url 'https://global.repo.jmix.io/repository/public'
+        }
     }
 
     jmix {
@@ -33,6 +33,9 @@ subprojects {
     buildFile.withInputStream { props.load(it) }
     def subArchivesBaseName = props.getProperty('archivesBaseName')
     def archName = subArchivesBaseName.substring(1, subArchivesBaseName.length() - 1)
+
+
+    sourceCompatibility = '1.8'
 
     java {
         withSourcesJar()
