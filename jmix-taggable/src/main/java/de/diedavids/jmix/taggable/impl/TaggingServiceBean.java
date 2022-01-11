@@ -5,6 +5,8 @@ import de.diedavids.jmix.taggable.entity.Tag;
 import de.diedavids.jmix.taggable.entity.Taggable;
 import de.diedavids.jmix.taggable.entity.Tagging;
 import io.jmix.core.DataManager;
+import io.jmix.core.FetchPlan;
+import io.jmix.core.FetchPlanBuilder;
 import io.jmix.core.Metadata;
 import io.jmix.core.SaveContext;
 import io.jmix.core.querycondition.PropertyCondition;
@@ -15,15 +17,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service(TaggingService.NAME)
 class TaggingServiceBean implements TaggingService {
 
-
-    private static final String TAGGING_VIEW_NAME = "tagging-view";
-    
     private final DataManager dataManager;
     private final Metadata metadata;
 
@@ -140,7 +140,7 @@ class TaggingServiceBean implements TaggingService {
 
     private Stream<Tagging> getTaggingsForEntityWithContext(Taggable taggable, String tagContext) {
 //        getTaggingsForEntity(taggable).findAll { it.context == tagContext }
-        return getTaggingsForEntity(taggable).stream().filter(it -> it.getContext().equals(tagContext));
+        return getTaggingsForEntity(taggable).stream().filter(it -> Objects.equals(it.getContext(),tagContext));
     }
 
     @Override
@@ -161,7 +161,7 @@ class TaggingServiceBean implements TaggingService {
 //        dataManager.loadList(loadContext);
         return dataManager.load(Tagging.class)
                 .condition(PropertyCondition.equal("taggable", taggable))
-                .fetchPlan(TAGGING_VIEW_NAME)
+                .fetchPlan(taggingWithTags())
                 .list();
     }
 
@@ -175,8 +175,13 @@ class TaggingServiceBean implements TaggingService {
 
         return dataManager.load(Tagging.class)
                 .condition(PropertyCondition.equal("tag", tag))
-                .fetchPlan(TAGGING_VIEW_NAME)
+                .fetchPlan(taggingWithTags())
                 .list();
+    }
+
+    private Consumer<FetchPlanBuilder> taggingWithTags() {
+        return fetchPlanBuilder -> fetchPlanBuilder.addFetchPlan(FetchPlan.BASE)
+                .add("tag", FetchPlan.BASE);
     }
 
 }
