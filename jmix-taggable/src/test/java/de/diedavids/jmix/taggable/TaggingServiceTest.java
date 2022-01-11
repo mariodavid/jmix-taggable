@@ -21,15 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class TaggingServiceTest {
 
     @Autowired
-    DataManager dataManager;
+    private DataManager dataManager;
 
     @Autowired
-    TaggingService sut;
+    private TaggingService sut;
 
+    private Tag small;
+    private Tag tall;
+    private Tag cool;
 
-    Tag small;
-    Tag tall;
-    Tag cool;
     private Product iPhone;
     private Product iPad;
 
@@ -166,20 +166,49 @@ class TaggingServiceTest {
         }
 
     }
+    @Nested
+    class GetTaggingsForEntity {
+
+        @Test
+        void given_iPhoneWithTwoTags_expect_twoTaggingsAreReturned() {
+
+            // given:
+            sut.setTagsForEntity(iPhone, asList(cool, small));
+            sut.setTagsForEntity(iPad, asList(tall));
+
+            // expect:
+            assertThat(sut.getTaggingsForEntity(iPhone))
+                    .hasSize(2)
+                    .anyMatch(it -> hasTag(it, cool))
+                    .anyMatch(it -> hasTag(it, small))
+                    .noneMatch(it -> hasTag(it, tall));
+        }
+
+        @Test
+        void given_iPhoneWithTagAndContext_expect_taggingWithContextToBeReturned() {
+
+            // given:
+            final String expectedContext = "someContext";
+            sut.setTagsForEntityWithContext(iPhone, asList(cool, small), expectedContext);
+            sut.setTagsForEntity(iPad, asList(tall));
+
+            // expect:
+            assertThat(sut.getTaggingsForEntity(iPhone))
+                    .hasSize(2)
+                    .allMatch(it -> it.getContext().equals(expectedContext));
+        }
+
+        private boolean hasTag(Tagging tagging, Tag cool) {
+            return tagging.getTag().equals(cool);
+        }
+
+    }
 
 
     private Tag tag(String value) {
         final Tag tag = dataManager.create(Tag.class);
         tag.setValue(value);
         return dataManager.save(tag);
-    }
-
-    private Tagging tagging(Taggable taggable, Tag tag, String context) {
-        final Tagging tagging = dataManager.create(Tagging.class);
-        tagging.setTag(tag);
-        tagging.setTaggable(taggable);
-        tagging.setContext(context);
-        return dataManager.save(tagging);
     }
 
     private Tagging tagging(Taggable taggable, Tag tag) {
