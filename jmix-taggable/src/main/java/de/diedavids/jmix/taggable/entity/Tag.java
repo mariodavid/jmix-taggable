@@ -3,6 +3,7 @@ package de.diedavids.jmix.taggable.entity;
 import io.jmix.core.annotation.DeletedBy;
 import io.jmix.core.annotation.DeletedDate;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
+import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -62,6 +63,7 @@ public class Tag {
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedDate;
 
+    @InstanceName
     @NotNull
     @Column(name = "VALUE_", nullable = false)
     protected String value;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://jmix.io/schema/ui/window"
+        caption="msg://tagAssignment.caption">
+
+    <data>
+        <instance id="holderDc"
+                  class="de.diedavids.jmix.taggable.entity.TagAssociationHolder">
+            <loader id="holderDl" />
+        </instance>
+        <collection id="allTagsDc"
+                  class="de.diedavids.jmix.taggable.entity.Tag">
+            <fetchPlan extends="_base"/>
+            <loader id="allTagsDl">
+                <query>
+                    <![CDATA[select e from jt_Tag e]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+
+    <actions>
+        <action id="createTag" icon="PLUS"/>
+        <action id="windowCommitAndClose" caption="msg:///actions.Ok"
+                icon="EDITOR_OK"
+                primary="true"
+                shortcut="${COMMIT_SHORTCUT}"/>
+        <action id="windowClose"
+                caption="msg:///actions.Close"
+                icon="EDITOR_CANCEL"/>
+    </actions>
+
+    <layout expand="tagManagementBox">
+
+        <hbox id="tagManagementBox"
+              expand="tagPicker"
+              width="100%"
+              spacing="true">
+
+            <tagPicker id="tagPicker"
+                       inlineTags="true"
+                       dataContainer="holderDc"
+                       property="tags"
+                       hideSelectedOptions="true"
+                       optionsContainer="allTagsDc"/>
+            <button id="createTagBtn"
+                    action="createTag"
+            />
+        </hbox>
+
+
+        <hbox id="editActions" spacing="true">
+            <button id="commitAndCloseBtn" action="windowCommitAndClose"/>
+            <button id="closeBtn" action="windowClose"/>
+        </hbox>
+    </layout>
+</window>

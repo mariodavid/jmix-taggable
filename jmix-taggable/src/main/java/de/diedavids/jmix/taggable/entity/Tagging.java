@@ -4,6 +4,8 @@ import de.diedavids.jmix.softreference.entity.SoftReferenceConverter;
 import io.jmix.core.annotation.DeletedBy;
 import io.jmix.core.annotation.DeletedDate;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
+import io.jmix.core.metamodel.annotation.DependsOnProperties;
+import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import io.jmix.core.metamodel.annotation.PropertyDatatype;
 import org.springframework.data.annotation.CreatedBy;
@@ -183,5 +185,11 @@ public class Tagging {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    @InstanceName
+    @DependsOnProperties({"tag", "taggable"})
+    public String getInstanceName() {
+        return String.format("%s %s", tag, taggable);
     }
 }

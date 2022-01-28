@@ -78,6 +78,7 @@ class TaggingServiceBean implements TaggingService {
                 .filter(it -> !newTags.contains(it))
                 .map(tagToRemove -> findTaggingToRemove(existingTaggings, tagToRemove))
                 .filter(Optional::isPresent)
+                .map(Optional::get)
                 .forEach(saveContext::removing);
     }
 
