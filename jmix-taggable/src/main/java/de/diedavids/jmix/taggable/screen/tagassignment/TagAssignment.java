@@ -8,12 +8,12 @@ import de.diedavids.jmix.taggable.screen.tag.TagCreate;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Metadata;
 import io.jmix.core.MetadataTools;
-import io.jmix.ui.Dialogs;
-import io.jmix.ui.Notifications;
 import io.jmix.ui.ScreenBuilders;
 import io.jmix.ui.action.Action;
 import io.jmix.ui.component.TagPicker;
+import io.jmix.ui.model.CollectionContainer;
 import io.jmix.ui.model.CollectionLoader;
+import io.jmix.ui.model.CollectionPropertyContainer;
 import io.jmix.ui.model.DataContext;
 import io.jmix.ui.model.InstanceContainer;
 import io.jmix.ui.screen.Install;
@@ -26,8 +26,11 @@ import io.jmix.ui.screen.UiController;
 import io.jmix.ui.screen.UiDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.util.StringUtils.hasText;
 
@@ -41,6 +44,8 @@ public class TagAssignment extends Screen {
     protected TaggingService taggingService;
 
 
+    @Autowired
+    private CollectionPropertyContainer<Tag> holderTagsDc;
     private String persistentAttribute;
     private String tagContext;
     private Taggable taggable;
@@ -58,13 +63,14 @@ public class TagAssignment extends Screen {
     private DataContext dataContext;
     @Autowired
     private InstanceContainer<TagAssociationHolder> holderDc;
+    @Autowired
+    private CollectionContainer<Tag> allTagsDc;
 
     @Subscribe
     public void onBeforeShow(BeforeShowEvent event) {
         getScreenData().loadAll();
         getWindow().setCaption(messageBundle.formatMessage("tagAssignment.caption", metadataTools.getInstanceName(taggable)));
     }
-
 
 
     public void setPersistentAttribute(String persistentAttribute) {
@@ -89,17 +95,23 @@ public class TagAssignment extends Screen {
                 .newEntity(tag)
                 .withAfterCloseListener(tagCreateAfterScreenCloseEvent -> {
                     if (tagCreateAfterScreenCloseEvent.closedWith(StandardOutcome.COMMIT)) {
-
                         allTagsDl.load();
-
-                        // setting the item value does not add the tag to the selection
-                        holderDc.getItem().getTags().add(tag);
-
-                        // setting the value explicitly also does not change the selection
-                        //tagPicker.setValue(holderDc.getItem().getTags());
+                        updateTagPicker(allTagsDc.getItem(tag.getId()));
                     }
                 })
                 .show();
+    }
+
+    private void updateTagPicker(Tag newTag) {
+        tagPicker.setValue(
+                Stream.concat(
+                                Optional.ofNullable(tagPicker.getValue())
+                                        .map(Collection::stream)
+                                        .orElse(Stream.empty()),
+                                Stream.of(newTag)
+                        )
+                        .collect(Collectors.toList())
+        );
     }
 
     @Subscribe("windowCommitAndClose")
@@ -107,8 +119,7 @@ public class TagAssignment extends Screen {
 
         if (!hasText(tagContext)) {
             taggingService.setTagsForEntity(taggable, holderDc.getItem().getTags(), persistentAttribute);
-        }
-        else {
+        } else {
             taggingService.setTagsForEntityWithContext(taggable, holderDc.getItem().getTags(), persistentAttribute, tagContext);
         }
 

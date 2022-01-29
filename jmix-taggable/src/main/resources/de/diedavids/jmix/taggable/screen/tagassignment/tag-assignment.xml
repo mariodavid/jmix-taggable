@@ -5,6 +5,7 @@
     <data>
         <instance id="holderDc"
                   class="de.diedavids.jmix.taggable.entity.TagAssociationHolder">
+            <collection id="holderTagsDc" property="tags" />
             <loader id="holderDl" />
         </instance>
         <collection id="allTagsDc"
