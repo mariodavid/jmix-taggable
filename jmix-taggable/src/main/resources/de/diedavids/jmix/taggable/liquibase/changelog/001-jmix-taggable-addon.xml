@@ -5,6 +5,57 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-
+    <changeSet id="1" author="jmix-taggable">
+        <createTable tableName="JT_TAG">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_TAG"/>
+            </column>
+            <column name="VERSION" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_BY" type="VARCHAR(255)"/>
+            <column name="CREATED_DATE" type="DATETIME"/>
+            <column name="LAST_MODIFIED_BY" type="VARCHAR(255)"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME"/>
+            <column name="DELETED_BY" type="VARCHAR(255)"/>
+            <column name="DELETED_DATE" type="DATETIME"/>
+            <column name="VALUE_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CONTEXT" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="jmix-taggable">
+        <createTable tableName="JT_TAGGING">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_TAGGING"/>
+            </column>
+            <column name="CREATED_BY" type="VARCHAR(255)"/>
+            <column name="CREATED_DATE" type="DATETIME"/>
+            <column name="LAST_MODIFIED_BY" type="VARCHAR(255)"/>
+            <column name="LAST_MODIFIED_DATE" type="DATETIME"/>
+            <column name="DELETED_BY" type="VARCHAR(255)"/>
+            <column name="DELETED_DATE" type="DATETIME"/>
+            <column name="VERSION" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TAG_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TAGGABLE" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CONTEXT" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="jmix-taggable">
+        <createIndex indexName="IDX_JT_TAGGING_ON_TAGGABLE" tableName="JT_TAGGING">
+            <column name="TAGGABLE"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="4" author="jmix-taggable">
+        <addForeignKeyConstraint baseColumnNames="TAG_ID" baseTableName="JT_TAGGING" constraintName="FK_TAGGING_ON_TAG"
+                                 referencedColumnNames="ID" referencedTableName="JT_TAG"/>
+    </changeSet>
 
 </databaseChangeLog>

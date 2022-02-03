@@ -13,7 +13,7 @@ dependencies {
 
     testRuntimeOnly 'org.hsqldb:hsqldb'
 
-    implementation 'de.diedavids.jmix.softreference:jmix-entity-soft-reference-starter:0.0.1'
+    implementation 'de.diedavids.jmix.softreference:jmix-entity-soft-reference-starter:1.1.0'
 }
 
 test {
