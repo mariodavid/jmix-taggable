@@ -1,34 +1,11 @@
 package de.diedavids.jmix.taggable.screen;
 
-import de.diedavids.jmix.taggable.TaggingService;
-import de.diedavids.jmix.taggable.entity.Tag;
-import de.diedavids.jmix.taggable.entity.Taggable;
-import de.diedavids.jmix.taggable.screen.tag.TagAssociations;
-import io.jmix.core.Messages;
-import io.jmix.ui.Actions;
-import io.jmix.ui.ScreenBuilders;
-import io.jmix.ui.UiComponents;
-import io.jmix.ui.action.BaseAction;
-import io.jmix.ui.action.ItemTrackingAction;
-import io.jmix.ui.action.ListAction;
-import io.jmix.ui.component.Button;
 import io.jmix.ui.component.ButtonsPanel;
-import io.jmix.ui.component.Component;
-import io.jmix.ui.component.ComponentContainer;
-import io.jmix.ui.component.HBoxLayout;
-import io.jmix.ui.component.Label;
-import io.jmix.ui.component.LinkButton;
 import io.jmix.ui.component.Table;
 import io.jmix.ui.screen.Extensions;
 import io.jmix.ui.screen.OpenMode;
 import io.jmix.ui.screen.Screen;
 import io.jmix.ui.screen.Subscribe;
-import io.jmix.ui.screen.UiControllerUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
-
-import java.util.Collection;
-import java.util.Collections;
 
 public interface WithTagsSupport {
 
@@ -115,50 +92,18 @@ public interface WithTagsSupport {
     @Subscribe
     default void initTagsButton(Screen.InitEvent event) {
 
-        Screen screen = event.getSource();
-        Button button = createOrGetButton(screen);
+        final Screen screen = event.getSource();
 
-        initButtonWithTagsFunctionality(screen, button);
-    }
-
-    default void initButtonWithTagsFunctionality(Screen screen, Button button) {
-
-        final ApplicationContext applicationContext = getApplicationContext(screen);
-        WithTagsSupportExecution withTagsBean = applicationContext.getBean(WithTagsSupportExecution.class);
-        Messages messages = applicationContext.getBean(Messages.class);
-        ScreenBuilders screenBuilders = applicationContext.getBean(ScreenBuilders.class);
-
-        final Actions actions = applicationContext.getBean(Actions.class);
-        final Taggable taggable = (Taggable) getListComponent().getSingleSelected();
-
-        ListAction tagsAction = actions.create(ItemTrackingAction.class, "tagsAction")
-                .withPrimary(true)
-                .withIcon(ICON_KEY)
-                .withCaption(messages.getMessage(BUTTON_MSG_KEY))
-                .withHandler(e -> withTagsBean.openTagAssignment(
+        withTagsSupportExecution(screen)
+                .initTagsTableButton(
+                        screen,
                         getPersistentAttribute(),
                         getTagContext(),
-                        screenBuilders,
-                        screen,
-                        UiControllerUtils.getScreenData(screen),
-                        getListComponent()
-                ));
-        getListComponent().addAction(tagsAction);
-        button.setAction(tagsAction);
-
+                        getListComponent(),
+                        getButtonId(),
+                        getButtonsPanel()
+                );
     }
-
-
-    default Button createOrGetButton(Screen screen) {
-        Assert.notNull(getButtonsPanel(), "Provided Buttons Panel was null. Cannot create Tag Button.");
-
-        ApplicationContext applicationContext = getApplicationContext(screen);
-        ButtonsPanelFactory buttonsPanelFactory = applicationContext.getBean(ButtonsPanelFactory.class);
-
-
-        return buttonsPanelFactory.createButton(getButtonId(), getButtonsPanel(), Collections.emptyList());
-    }
-
 
     @Subscribe
     default void initTagsTableColumn(Screen.InitEvent event) {
@@ -166,68 +111,17 @@ public interface WithTagsSupport {
         if (showTagsInList()) {
             Screen screen = event.getSource();
 
-            ApplicationContext applicationContext = getApplicationContext(screen);
-
-            TaggingService taggingService = applicationContext.getBean(TaggingService.class);
-            UiComponents uiComponents = applicationContext.getBean(UiComponents.class);
-            Messages messages = applicationContext.getBean(Messages.class);
-
-            getListComponent().addGeneratedColumn(messages.getMessage(COLUMN_MSG_KEY), (Table.ColumnGenerator<Object>) entity -> {
-                Collection<Tag> tags = taggingService.getTagsWithContext((Taggable) entity, getTagContext());
-                ComponentContainer layout = createContainerComponentForTags(uiComponents);
-
-                tags.stream()
-                        .map(tag -> createComponentForTag(uiComponents, tag, screen))
-                        .forEach(layout::add);
-
-                return layout;
-            });
-        }
-    }
-
-
-    default ApplicationContext getApplicationContext(Screen screen) {
-        return Extensions.getApplicationContext(screen);
-    }
-
-
-    default ComponentContainer createContainerComponentForTags(UiComponents uiComponents) {
-        HBoxLayout layout = uiComponents.create(HBoxLayout.NAME);
-        layout.setSpacing(true);
-        return layout;
-    }
-
-    default Component createComponentForTag(UiComponents uiComponents, Tag tag, Screen screen) {
-        if (showTagsAsLink()) {
-
-            final ApplicationContext applicationContext = getApplicationContext(screen);
-            final ScreenBuilders screenBuilders = applicationContext.getBean(ScreenBuilders.class);
-            LinkButton tagComponent = uiComponents.create(LinkButton.NAME);
-            tagComponent.setCaption(tag.getValue());
-            tagComponent.setIcon(ICON_KEY);
-            tagComponent.setAction(
-                    new BaseAction("openTag")
-                            .withHandler(e -> {
-
-                                final TagAssociations tagEditor = screenBuilders.editor(Tag.class, screen)
-                                        .withScreenClass(TagAssociations.class)
-                                        .editEntity(tag)
-                                        .withOpenMode(tagLinkOpenMode())
-                                        .build();
-
-                                tagEditor.setTagLinkOpenMode(tagLinkOpenMode());
-                            })
+            withTagsSupportExecution(screen).initTagsTableColumn(
+                    screen,
+                    getListComponent(),
+                    getTagContext(),
+                    tagLinkOpenMode(),
+                    showTagsAsLink()
             );
-            return tagComponent;
-
-        } else {
-            Label<String> tagComponent = uiComponents.create(Label.NAME);
-            tagComponent.setValue(tag.getValue());
-            tagComponent.setIcon(ICON_KEY);
-            return tagComponent;
-
         }
     }
 
-
+    default WithTagsSupportExecution withTagsSupportExecution(Screen screen) {
+        return Extensions.getApplicationContext(screen).getBean(WithTagsSupportExecution.class);
+    }
 }

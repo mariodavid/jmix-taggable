@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <window xmlns="http://jmix.io/schema/ui/window"
-        caption="msg://de.diedavids.jmix.taggable.screen.tag/tagAssociations.caption"
-        focusComponent="form">
-    <data>
-        <instance id="tagDc"
-                  class="de.diedavids.jmix.taggable.entity.Tag">
-            <fetchPlan extends="_base"/>
-            <loader/>
-        </instance>
-    </data>
+        caption="msg://de.diedavids.jmix.taggable.screen.tag/tagAssociations.caption">
     <facets>
         <dataLoadCoordinator auto="true"/>
     </facets>
@@ -17,22 +9,13 @@
                 icon="EDITOR_OK"
                 primary="true"
                 shortcut="${COMMIT_SHORTCUT}"/>
-        <action id="windowClose"
-                caption="msg:///actions.Close"
-                icon="EDITOR_CANCEL"/>
     </actions>
     <dialogMode height="600"
                 width="800"/>
-    <layout spacing="true" expand="editActions">
-        <form id="form" dataContainer="tagDc">
-            <column width="350px">
-                <textField id="valueField" property="value"/>
-                <textField id="contextField" property="context"/>
-            </column>
-        </form>
+    <layout spacing="true" expand="tableBox">
+        <hbox id="tableBox" width="100%"/>
         <hbox id="editActions" spacing="true">
             <button id="commitAndCloseBtn" action="windowCommitAndClose"/>
-            <button id="closeBtn" action="windowClose"/>
         </hbox>
     </layout>
 </window>

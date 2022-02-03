@@ -2,7 +2,7 @@ package de.diedavids.jmix.taggable.screen.tagassignment;
 
 import de.diedavids.jmix.taggable.TaggingService;
 import de.diedavids.jmix.taggable.entity.Tag;
-import de.diedavids.jmix.taggable.entity.TagAssociationHolder;
+import de.diedavids.jmix.taggable.entity.TaggableToTagsDTO;
 import de.diedavids.jmix.taggable.entity.Taggable;
 import de.diedavids.jmix.taggable.screen.tag.TagCreate;
 import io.jmix.core.LoadContext;
@@ -62,7 +62,7 @@ public class TagAssignment extends Screen {
     @Autowired
     private DataContext dataContext;
     @Autowired
-    private InstanceContainer<TagAssociationHolder> holderDc;
+    private InstanceContainer<TaggableToTagsDTO> holderDc;
     @Autowired
     private CollectionContainer<Tag> allTagsDc;
 
@@ -132,14 +132,14 @@ public class TagAssignment extends Screen {
     }
 
     @Install(to = "holderDl", target = Target.DATA_LOADER)
-    private TagAssociationHolder holderDlLoadDelegate(LoadContext<TagAssociationHolder> loadContext) {
+    private TaggableToTagsDTO holderDlLoadDelegate(LoadContext<TaggableToTagsDTO> loadContext) {
 
         final List<Tag> tags = taggingService.getTagsWithContext(taggable, tagContext)
                 .stream()
                 .collect(Collectors.toList());
-        final TagAssociationHolder tagAssociationHolder = metadata.create(TagAssociationHolder.class);
-        tagAssociationHolder.setTaggable(taggable);
-        tagAssociationHolder.setTags(tags);
-        return tagAssociationHolder;
+        final TaggableToTagsDTO taggableToTagsDTO = metadata.create(TaggableToTagsDTO.class);
+        taggableToTagsDTO.setTaggable(taggable);
+        taggableToTagsDTO.setTags(tags);
+        return taggableToTagsDTO;
     }
 }

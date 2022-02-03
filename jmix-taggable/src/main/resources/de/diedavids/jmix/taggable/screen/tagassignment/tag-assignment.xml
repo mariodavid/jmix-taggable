@@ -4,7 +4,7 @@
 
     <data>
         <instance id="holderDc"
-                  class="de.diedavids.jmix.taggable.entity.TagAssociationHolder">
+                  class="de.diedavids.jmix.taggable.entity.TaggableToTagsDTO">
             <collection id="holderTagsDc" property="tags" />
             <loader id="holderDl" />
         </instance>

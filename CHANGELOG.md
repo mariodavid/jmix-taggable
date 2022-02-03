@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - [Breaking] All entities that support Tagging, now need to implement the `de.diedavids.jmix.taggable.entity.Taggable` marker interface
+- [Breaking] The user who created a tag is not available via `Tagging::getTagger` anymore, but now the regular Jmix `createdBy` field is used
 - `WithTagsSupport::tagLinkOpenType` has been replaced by `WithTagsSupport::tagLinkOpenMode`. Now uses `io.jmix.ui.screen.OpenMode` instead of `com.haulmont.cuba.gui.WindowManager.OpenType`
 
 

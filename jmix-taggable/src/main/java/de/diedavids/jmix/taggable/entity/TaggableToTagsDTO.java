@@ -8,8 +8,8 @@ import io.jmix.core.metamodel.annotation.PropertyDatatype;
 import java.util.List;
 import java.util.UUID;
 
-@JmixEntity(name = "jt_TagAssociationHolder")
-public class TagAssociationHolder {
+@JmixEntity(name = "jt_TaggableToTagsDTO")
+public class TaggableToTagsDTO {
     @JmixGeneratedValue
     @JmixId
     private UUID id;
